@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop">
+  <id>com.creality.crealityprint</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>LGPL-3.0 and CC-BY-SA-4.0</project_license>
+	<name>CrealityPrint</name>
+	<summary>Slicer to prepare your 3D printing projects</summary>
+	<description>
+        <p>Creality Print is a self-developed FDM slicing software produced by Shenzhen Creality 3D Technology Co., Ltd. It’s a practical and easy-to-use tool that can help you remote control and monitor your 3D printer and help print directly from your computer. With Creality Print, you can access your Creality Cloud account to operate the printing process, including searching, uploading, importing, editing models, setting printing and slicing parameters, remote controlling your 3D printing, etc. It allows you to save the G-code on your computer and send it to the printer through a USB serial port or Wi-Fi connectivity, or to import and export the G-code from Creality Cloud and print directly from the Creality Cloud APP.</p>
+    </description>
+  <url type="homepage">https://github.com/CrealityOfficial/CrealityPrint</url>
+  <releases>
+    <release version="4.3.7" date="2023-10-28"/>
+  </releases>
+</component>

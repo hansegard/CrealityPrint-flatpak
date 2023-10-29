@@ -1,0 +1,64 @@
+app-id: com.creality.crealityprint
+runtime: org.freedesktop.Platform
+runtime-version: '23.08'
+sdk: org.freedesktop.Sdk
+finish-args:
+  - --share=ipc
+  - --socket=wayland
+  - --socket=x11
+  # For accessing network printers
+  - --share=network
+  # For accessing usb printers
+  - --device=all
+  # To access user files
+  - --filesystem=home
+  # To access SD-Cards
+  - --filesystem=/media
+  - --filesystem=/run/media
+  # For umount
+  - --system-talk-name=org.freedesktop.UDisks2
+command: start-crealityprint-flatpak.sh
+modules:
+  - name: crealityprint
+    buildsystem: simple
+    build-commands:
+      # Extract the Appimage
+      - chmod a+x Creality_Print.AppImage
+      - ./Creality_Print.AppImage --appimage-extract >/dev/null
+      - chmod -R --reference=Creality_Print.AppImage squashfs-root
+      - rm ./Creality_Print.AppImage
+
+      # Patch .destop file with the new icon and binary location
+      - sed -i -e 's/Icon.*/Icon=com.creality.crealityprint/' squashfs-root/default.desktop
+      - sed -i -e 's/Exec.*/Exec=start-crealityprint-flatpak.sh %F/' squashfs-root/default.desktop
+
+      # Move things into place
+      - mkdir /app/crealityprint
+      - cp -r squashfs-root/* /app/crealityprint
+      - install -Dm644 squashfs-root/default.desktop /app/share/applications/com.creality.crealityprint.desktop
+      - install -Dm644 squashfs-root/default.png /app/share/icons/hicolor/scalable/apps/com.creality.crealityprint.png
+      - install -Dm644 com.creality.crealityprint.appdata.xml /app/share/appdata/com.creality.crealityprint.appdata.xml
+      - install -Dm 544 start-crealityprint-flatpak.sh /app/bin/start-crealityprint-flatpak.sh
+
+      # Umount wrapper used to redirect umount calls to udisk2
+      - install umount /app/bin
+
+    sources:
+      - type: file
+        url: https://github.com/CrealityOfficial/CrealityPrint/releases/download/v4.3.7/Creality_Print-v4.3.7.6631-x86_64-Release.AppImage
+        sha256: cdce2a98fc5964bc7a882986d185615c2b6c7bda6b50b3c6a11ca613f6621b60
+        dest-filename: Creality_Print.AppImage
+        x-checker-data:
+          type: json
+          url: https://api.github.com/repos/CrealityOfficial/CrealityPrint/releases/latest
+          version-query: .tag_name
+          url-query: .assets[] | select(.name|match("Creality_Print-.*-x86_64-Release\\.AppImage$"))
+            | .browser_download_url
+      - type: file
+        path: com.creality.crealityprint.appdata.xml
+      - type: script
+        dest-filename: start-crealityprint-flatpak.sh
+        commands:
+          - /app/crealityprint/AppRun "$@"
+      - type: file
+        path: umount
